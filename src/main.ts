@@ -4,7 +4,9 @@ if (!process.env.IS_TS_NODE) {
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@app/app.module";
-// 3-4
+// 3-5
+// TODO
+// Refactoring path depends and <any> types
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);

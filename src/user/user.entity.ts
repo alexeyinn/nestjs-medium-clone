@@ -7,6 +7,9 @@ export class UserEntity {
   id: number;
 
   @Column()
+  userName: string;
+
+  @Column()
   email: string;
 
   @Column({ default: "" })
