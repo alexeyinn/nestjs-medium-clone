@@ -4,7 +4,7 @@ if (!process.env.IS_TS_NODE) {
 
 import { NestFactory } from "@nestjs/core";
 import { AppModule } from "@app/app.module";
-// 3-3
+// 3-4
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   await app.listen(3000);
