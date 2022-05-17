@@ -6,6 +6,8 @@ import { Repository } from "typeorm";
 import { sign } from "jsonwebtoken";
 import { JWT_SECRET } from "@app/config";
 import { UserResponseInterface } from "@app/types/userResponse.interface";
+import { compare } from "bcrypt";
+import { LoginUserDto } from "@app/user/dto/loginUser.dto";
 
 @Injectable()
 export class UserService {
@@ -14,12 +16,12 @@ export class UserService {
     private readonly userRepository: Repository<UserEntity>
   ) {}
 
-  async createUser(dto: CreateUserDto): Promise<UserEntity> {
+  async createUser(createUserDto: CreateUserDto): Promise<UserEntity> {
     const userByEmail = await this.userRepository.findOne({
-      email: dto.email,
+      email: createUserDto.email,
     });
     const userByUserName = await this.userRepository.findOne({
-      userName: dto.userName,
+      userName: createUserDto.userName,
     });
     if (userByEmail || userByUserName) {
       throw new HttpException(
@@ -29,8 +31,40 @@ export class UserService {
     }
 
     const newUser = new UserEntity();
-    Object.assign(newUser, dto);
+    Object.assign(newUser, createUserDto);
     return await this.userRepository.save(newUser);
+  }
+
+  async login(loginUserDto: LoginUserDto) {
+    const user = await this.userRepository.findOne(
+      {
+        email: loginUserDto.email,
+      },
+      { select: ["id", "bio", "email", "image", "password", "userName"] }
+    );
+
+    if (!user) {
+      throw new HttpException(
+        "Credentials are not valid!",
+        HttpStatus.UNPROCESSABLE_ENTITY
+      );
+    }
+
+    const isPasswordCorrect = await compare(
+      loginUserDto.password,
+      user.password
+    );
+
+    if (!isPasswordCorrect) {
+      throw new HttpException(
+        "Credentials are not valid!",
+        HttpStatus.UNPROCESSABLE_ENTITY
+      );
+    }
+
+    delete user.password;
+
+    return user;
   }
 
   generateJwt(user: UserEntity): string {
