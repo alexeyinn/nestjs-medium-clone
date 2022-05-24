@@ -4,6 +4,8 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Repository } from "typeorm";
 import { ArticleEntity } from "@app/article/article.entity";
 import { CreateArticleDto } from "@app/article/dto/createArticle.dto";
+import { ArticleResponseInterface } from "@app/article/types/articleResponse.interface";
+import slugify from "slugify";
 
 @Injectable()
 export class ArticleService {
@@ -22,12 +24,23 @@ export class ArticleService {
     if (!article.tagList) {
       article.tagList = [];
     }
-    // TODO
-    // Решить проблему с генерацией slug и убрать эту заглушку
-    article.slug = "foo";
+
+    article.slug = this.getSlug(createArticleDto.title);
 
     article.author = currentUser;
 
     return await this.articleRepository.save(article);
+  }
+
+  buildArticleResponse(article: ArticleEntity): ArticleResponseInterface {
+    return { article };
+  }
+
+  private getSlug(slug: string): string {
+    return (
+      slugify(slug, { lower: true }) +
+      "-" +
+      ((Math.random() * Math.pow(36, 6)) | 0).toString()
+    );
   }
 }
