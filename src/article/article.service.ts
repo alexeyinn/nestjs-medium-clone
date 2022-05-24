@@ -1,7 +1,7 @@
 import { UserEntity } from "@app/user/user.entity";
-import { Injectable } from "@nestjs/common";
+import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
-import { Repository } from "typeorm";
+import { DeleteResult, Repository } from "typeorm";
 import { ArticleEntity } from "@app/article/article.entity";
 import { CreateArticleDto } from "@app/article/dto/createArticle.dto";
 import { ArticleResponseInterface } from "@app/article/types/articleResponse.interface";
@@ -39,6 +39,23 @@ export class ArticleService {
   async findBySlug(slug: string): Promise<ArticleEntity> {
     const article = this.articleRepository.findOne({ slug });
     return article;
+  }
+
+  async deleteArticle(
+    slug: string,
+    currentUserId: number
+  ): Promise<DeleteResult> {
+    const article = await this.findBySlug(slug);
+
+    if (!article) {
+      throw new HttpException("Article does not exist!", HttpStatus.NOT_FOUND);
+    }
+
+    if (article.author.id !== currentUserId) {
+      throw new HttpException("Article does not exist!", HttpStatus.FORBIDDEN);
+    }
+
+    return await this.articleRepository.delete({ slug });
   }
 
   private getSlug(slug: string): string {
