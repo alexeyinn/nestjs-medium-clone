@@ -36,6 +36,11 @@ export class ArticleService {
     return { article };
   }
 
+  async findBySlug(slug: string): Promise<ArticleEntity> {
+    const article = this.articleRepository.findOne({ slug });
+    return article;
+  }
+
   private getSlug(slug: string): string {
     return (
       slugify(slug, { lower: true }) +
