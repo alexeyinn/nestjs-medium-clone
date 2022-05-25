@@ -5,7 +5,7 @@ import { UserEntity } from "@app/user/user.entity";
 import { Repository } from "typeorm";
 import { sign } from "jsonwebtoken";
 import { JWT_SECRET } from "@app/config";
-import { UserResponseInterface } from "@app/types/userResponse.interface";
+import { UserResponseInterface } from "@app/user/types/userResponse.interface";
 import { compare } from "bcrypt";
 import { LoginUserDto } from "@app/user/dto/loginUser.dto";
 import { UpdateUserDto } from "@app/user/dto/updateUser.dto";
